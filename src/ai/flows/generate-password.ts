@@ -1,0 +1,57 @@
+'use server';
+
+/**
+ * @fileOverview Generates a random password based on the selected difficulty level.
+ *
+ * - generatePassword - A function that generates a password.
+ * - GeneratePasswordInput - The input type for the generatePassword function.
+ * - GeneratePasswordOutput - The return type for the generatePassword function.
+ */
+
+import { z } from 'zod';
+
+const GeneratePasswordInputSchema = z.object({
+  length: z.number().min(4).max(20).default(4).describe('The desired length of the password.'),
+  includeSpecialChars: z.boolean().default(false).describe('Whether to include special characters in the password.'),
+});
+export type GeneratePasswordInput = z.infer<typeof GeneratePasswordInputSchema>;
+
+const GeneratePasswordOutputSchema = z.object({
+  password: z.string().describe('The generated password.'),
+});
+export type GeneratePasswordOutput = z.infer<typeof GeneratePasswordOutputSchema>;
+
+export async function generatePassword(input: GeneratePasswordInput): Promise<GeneratePasswordOutput> {
+  const { length, includeSpecialChars } = input;
+
+  const lowerCaseChars = 'abcdefghijklmnopqrstuvwxyz';
+  const upperCaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const numberChars = '0123456789';
+  const specialChars = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+  let charSet = lowerCaseChars + upperCaseChars + numberChars;
+  const passwordChars = [];
+
+  // Ensure at least one character of each type
+  passwordChars.push(lowerCaseChars[Math.floor(Math.random() * lowerCaseChars.length)]);
+  passwordChars.push(upperCaseChars[Math.floor(Math.random() * upperCaseChars.length)]);
+  passwordChars.push(numberChars[Math.floor(Math.random() * numberChars.length)]);
+  
+  if (includeSpecialChars) {
+    charSet += specialChars;
+    passwordChars.push(specialChars[Math.floor(Math.random() * specialChars.length)]);
+  }
+
+  // Fill the rest of the password length with random characters from the full set
+  for (let i = passwordChars.length; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charSet.length);
+    passwordChars.push(charSet[randomIndex]);
+  }
+  
+  // Shuffle the array to ensure randomness of character positions
+  const shuffledPassword = passwordChars
+    .sort(() => Math.random() - 0.5)
+    .join('');
+
+  return Promise.resolve({ password: 'Mobile@' + shuffledPassword });
+}
