@@ -16,10 +16,11 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, RefreshCw, Loader2 } from "lucide-react";
+import { Copy, RefreshCw, Loader2, RotateCcw } from "lucide-react";
 import { Logo } from "@/components/logo";
 
 export default function Home() {
+  const [prefix, setPrefix] = React.useState("Mobile");
   const [length, setLength] = React.useState(8);
   const [includeSpecialChars, setIncludeSpecialChars] = React.useState(true);
   const [password, setPassword] = React.useState("");
@@ -27,11 +28,12 @@ export default function Home() {
 
   const { toast } = useToast();
 
-  const handleGeneratePassword = async () => {
+  const handleGeneratePassword = React.useCallback(async () => {
     setIsLoading(true);
     setPassword("");
     try {
       const result = await generatePassword({
+        prefix: prefix,
         length,
         includeSpecialChars,
       });
@@ -46,7 +48,7 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [prefix, length, includeSpecialChars, toast]);
 
   const handleCopy = () => {
     if (!password) return;
@@ -57,9 +59,17 @@ export default function Home() {
     });
   };
 
+  const handleResetPrefix = () => {
+    setPrefix("Mobile");
+    toast({
+      title: "Prefixo restaurado!",
+      description: 'O prefixo foi restaurado para "Mobile".',
+    });
+  };
+
   React.useEffect(() => {
     handleGeneratePassword();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -70,13 +80,35 @@ export default function Home() {
           <CardHeader>
             <CardTitle className="text-2xl">Gerador de Senha</CardTitle>
             <CardDescription>
-              Sua senha começará com "Mobile@" e você pode personalizar o restante.
+              Personalize o prefixo e as opções para gerar sua senha. O padrão é 'Mobile@'.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
+              <Label htmlFor="prefix">Prefixo da Senha</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="prefix"
+                  value={prefix}
+                  onChange={(e) => setPrefix(e.target.value)}
+                  placeholder="Ex: Mobile"
+                  disabled={isLoading}
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleResetPrefix}
+                  aria-label="Restaurar prefixo padrão"
+                  disabled={isLoading}
+                >
+                  <RotateCcw className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <Label htmlFor="length">Comprimento adicional</Label>
+                <Label htmlFor="length">Comprimento (depois do @)</Label>
                 <span className="font-bold text-primary text-lg">{length}</span>
               </div>
               <Slider

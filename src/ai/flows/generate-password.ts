@@ -11,8 +11,9 @@
 import { z } from 'zod';
 
 const GeneratePasswordInputSchema = z.object({
-  length: z.number().min(4).max(20).default(4).describe('The desired length of the password.'),
-  includeSpecialChars: z.boolean().default(false).describe('Whether to include special characters in the password.'),
+  prefix: z.string().default('Mobile').describe('The prefix for the password.'),
+  length: z.number().min(4).max(20).default(8).describe('The desired length of the password after the prefix.'),
+  includeSpecialChars: z.boolean().default(true).describe('Whether to include special characters in the password.'),
 });
 export type GeneratePasswordInput = z.infer<typeof GeneratePasswordInputSchema>;
 
@@ -22,12 +23,12 @@ const GeneratePasswordOutputSchema = z.object({
 export type GeneratePasswordOutput = z.infer<typeof GeneratePasswordOutputSchema>;
 
 export async function generatePassword(input: GeneratePasswordInput): Promise<GeneratePasswordOutput> {
-  const { length, includeSpecialChars } = input;
+  const { prefix, length, includeSpecialChars } = GeneratePasswordInputSchema.parse(input);
 
   const lowerCaseChars = 'abcdefghijklmnopqrstuvwxyz';
   const upperCaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const numberChars = '0123456789';
-  const specialChars = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+  const specialChars = '@#%&$';
 
   let charSet = lowerCaseChars + upperCaseChars + numberChars;
   const passwordChars = [];
@@ -52,6 +53,8 @@ export async function generatePassword(input: GeneratePasswordInput): Promise<Ge
   const shuffledPassword = passwordChars
     .sort(() => Math.random() - 0.5)
     .join('');
+  
+  const finalPrefix = prefix.trim() === '' ? 'Mobile' : prefix.trim();
 
-  return Promise.resolve({ password: 'Mobile@' + shuffledPassword });
+  return Promise.resolve({ password: `${finalPrefix}@${shuffledPassword}` });
 }
