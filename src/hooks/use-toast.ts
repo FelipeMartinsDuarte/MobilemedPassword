@@ -8,14 +8,15 @@ import type {
   ToastProps,
 } from "@/components/ui/toast"
 
-const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_LIMIT = 3
+const TOAST_REMOVE_DELAY = 1000 * 60 * 60 * 24 // 1 day
 
 type ToasterToast = ToastProps & {
   id: string
   title?: React.ReactNode
   description?: React.ReactNode
   action?: ToastActionElement
+  duration?: number
 }
 
 const actionTypes = {
@@ -183,6 +184,24 @@ function useToast() {
       }
     }
   }, [state])
+
+  React.useEffect(() => {
+    const timeouts = new Map<string, ReturnType<typeof setTimeout>>();
+    state.toasts.forEach(t => {
+      if (t.duration && !timeouts.has(t.id)) {
+        const timeout = setTimeout(() => {
+          dispatch({ type: "DISMISS_TOAST", toastId: t.id });
+          timeouts.delete(t.id);
+        }, t.duration);
+        timeouts.set(t.id, timeout);
+      }
+    });
+
+    return () => {
+      timeouts.forEach(timeout => clearTimeout(timeout));
+    }
+  }, [state.toasts]);
+
 
   return {
     ...state,
