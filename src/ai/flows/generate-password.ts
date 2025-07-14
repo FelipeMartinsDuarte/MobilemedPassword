@@ -29,7 +29,7 @@ export async function generatePassword(input: GeneratePasswordInput): Promise<Ge
   const lowerCaseChars = 'abcdefghijklmnopqrstuvwxyz';
   const upperCaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const numberChars = '0123456789';
-  const specialChars = '@#%&$';
+  const specialChars = '$*&@#';
 
   let charSet = '';
   const passwordChars = [];
