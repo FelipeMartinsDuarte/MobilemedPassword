@@ -271,6 +271,30 @@ export default function Home() {
     URL.revokeObjectURL(url);
   };
 
+  // Função para copiar credenciais para a área de transferência
+  const copyCredentialsToClipboard = () => {
+    const content = savedUsers.map(u => `Email: ${u.email} Senha:${u.password}`).join('\n');
+    navigator.clipboard.writeText(content);
+    toast({
+      title: "Copiado!",
+      description: "Credenciais copiadas para a área de transferência.",
+      duration: 2000,
+    });
+  };
+
+  // Função para copiar mensagens de boas-vindas para a área de transferência
+  const copyWelcomeMessagesToClipboard = () => {
+    const content = savedUsers.map(u => 
+      `Seja Bem Vindo ao nosso sistema de Telerradiologia MobileMed segue a baixo as informações necessárias para o seu primeiro acesso Portal: laudos.mobilemed.com.br/login\nLogin: e-mail: ${u.email}\nSenha Temporária: ${u.password}`
+    ).join('\n\n---\n\n');
+    navigator.clipboard.writeText(content);
+    toast({
+      title: "Copiado!",
+      description: "Mensagens de boas-vindas copiadas para a área de transferência.",
+      duration: 2000,
+    });
+  };
+
 
   React.useEffect(() => {
     handleGenerateAllPasswords();
@@ -314,16 +338,22 @@ export default function Home() {
                   </div>
                 </ScrollArea>
                 <DialogFooter>
-                    <div className="w-full flex justify-between">
+                    <div className="w-full flex justify-between flex-col sm:flex-row gap-2">
                         <Button variant="destructive" onClick={handleResetSavedUsers}>
                             <Trash2 className="mr-2 h-4 w-4" /> Resetar
                         </Button>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2 justify-end">
                             <Button variant="secondary" onClick={exportCredentials} disabled={savedUsers.length === 0}>
                                 <Download className="mr-2 h-4 w-4" /> Exportar Credenciais
                             </Button>
-                             <Button onClick={exportWelcomeMessages} disabled={savedUsers.length === 0}>
+                            <Button variant="outline" onClick={copyCredentialsToClipboard} disabled={savedUsers.length === 0}>
+                                <Copy className="mr-2 h-4 w-4" /> Copiar Credenciais
+                            </Button>
+                            <Button onClick={exportWelcomeMessages} disabled={savedUsers.length === 0}>
                                 <Download className="mr-2 h-4 w-4" /> Exportar Mensagens
+                            </Button>
+                            <Button variant="outline" onClick={copyWelcomeMessagesToClipboard} disabled={savedUsers.length === 0}>
+                                <Copy className="mr-2 h-4 w-4" /> Copiar Mensagens
                             </Button>
                         </div>
                     </div>
