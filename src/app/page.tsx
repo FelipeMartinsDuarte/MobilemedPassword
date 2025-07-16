@@ -522,8 +522,17 @@ export default function Home() {
                            <Button variant="ghost" size="icon" onClick={() => handleRegeneratePassword(index)} aria-label="Regerar senha">
                             <RefreshCw className="h-5 w-5" />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleSaveUser(index)} aria-label="Salvar usuário" disabled={savedEntries.has(index)}>
-                           <Save className="h-5 w-5 text-primary"/>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleCopy(password)}
+                            aria-label="Copiar senha"
+                            className="text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                          >
+                            <Copy className="h-5 w-5" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => handleSaveUser(index)} aria-label="Salvar usuário" disabled={savedEntries.has(index)} className="text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/20">
+                            <Save className="h-5 w-5 text-primary"/>
                           </Button>
                         </>
                       ) : (
